@@ -1,0 +1,9 @@
+{
+	"name": "brodeji",
+	"location": "uksouth",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "6a910437-a349-4414-a737-13f5f7776628",
+		"tenantId": "07ef1208-413c-4b5e-9cdd-64ef305754f0"
+	}
+}
