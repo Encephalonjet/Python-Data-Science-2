@@ -1,0 +1,29 @@
+{
+	"name": "az_ADLS_inputEmp_tq",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureDataLakeS_lekanadfstorage",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "inputEmp_tq.txt",
+				"folderPath": "Source",
+				"fileSystem": "lekadfcontainer"
+			},
+			"columnDelimiter": "|",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "\"FirstName\"|\"LastName\"",
+				"type": "String"
+			}
+		]
+	}
+}
