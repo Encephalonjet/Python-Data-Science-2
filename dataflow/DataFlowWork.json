@@ -1,0 +1,129 @@
+{
+	"name": "DataFlowWork",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "az_ADL_ProductsAll",
+						"type": "DatasetReference"
+					},
+					"name": "ProductsAll"
+				},
+				{
+					"dataset": {
+						"referenceName": "az_ADL_ProductModel",
+						"type": "DatasetReference"
+					},
+					"name": "ProductModel"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "az_ADL_ProductFinals",
+						"type": "DatasetReference"
+					},
+					"name": "ProductsFinal"
+				}
+			],
+			"transformations": [
+				{
+					"name": "CombineDatasets"
+				},
+				{
+					"name": "RemoveDuplicateColumns"
+				},
+				{
+					"name": "RemoveNoListPrice"
+				}
+			],
+			"scriptLines": [
+				"parameters{",
+				"     parameter1 as string",
+				"}",
+				"source(output(",
+				"          ProductID as short,",
+				"          Name as string,",
+				"          ProductNumber as string,",
+				"          MakeFlag as boolean,",
+				"          FinishedGoodsFlag as boolean,",
+				"          Color as string,",
+				"          SafetyStockLevel as short,",
+				"          ReorderPoint as short,",
+				"          StandardCost as double,",
+				"          ListPrice as double,",
+				"          Size as string,",
+				"          SizeUnitMeasureCode as string,",
+				"          WeightUnitMeasureCode as string,",
+				"          Weight as integer,",
+				"          DaysToManufacture as short,",
+				"          ProductLine as string,",
+				"          Class as string,",
+				"          Style as string,",
+				"          ProductSubcategoryID as string,",
+				"          ProductModelID as string,",
+				"          SellStartDate as timestamp,",
+				"          SellEndDate as timestamp,",
+				"          DiscontinuedDate as timestamp",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> ProductsAll",
+				"source(output(",
+				"          ProductModelID as string,",
+				"          Name as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> ProductModel",
+				"ProductsAll, ProductModel lookup(ProductsAll@ProductModelID == ProductModel@ProductModelID,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> CombineDatasets",
+				"CombineDatasets select(mapColumn(",
+				"          ProductID,",
+				"          Name = ProductsAll@Name,",
+				"          {Model Name} = ProductModel@Name,",
+				"          ProductNumber,",
+				"          MakeFlag,",
+				"          FinishedGoodsFlag,",
+				"          Color,",
+				"          SafetyStockLevel,",
+				"          ReorderPoint,",
+				"          StandardCost,",
+				"          ListPrice,",
+				"          Size,",
+				"          SizeUnitMeasureCode,",
+				"          WeightUnitMeasureCode,",
+				"          Weight,",
+				"          DaysToManufacture,",
+				"          ProductLine,",
+				"          Class,",
+				"          Style,",
+				"          ProductSubcategoryID,",
+				"          ProductModelID = ProductsAll@ProductModelID,",
+				"          SellStartDate,",
+				"          SellEndDate,",
+				"          DiscontinuedDate",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> RemoveDuplicateColumns",
+				"RemoveDuplicateColumns filter(notEquals(ListPrice,0)) ~> RemoveNoListPrice",
+				"RemoveNoListPrice sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          ID as string,",
+				"          FirstName as string,",
+				"          LastName as string",
+				"     ),",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> ProductsFinal"
+			]
+		}
+	}
+}
