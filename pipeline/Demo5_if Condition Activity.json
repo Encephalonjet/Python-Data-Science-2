@@ -88,7 +88,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"expression": {
-						"value": "@greaterOrEquals(\n    addhours(formatDateTime(activity('Get Metadata Last Modified Date').output.lastModified, 'o'), -4),activity('Lookup Last Execution Date').output.value.firstRow.ExecutionDate\n)",
+						"value": "@greaterOrEquals(\n    addhours(formatDateTime(activity('Get Metadata Last Modified Date').output.lastModified, 'o'), -4),activity('Lookup Last Execution Date').output.firstRow.ExecutionDate\n)",
 						"type": "Expression"
 					},
 					"ifFalseActivities": [
@@ -110,6 +110,35 @@
 							"userProperties": [],
 							"typeProperties": {
 								"waitTimeInSeconds": 1
+							}
+						},
+						{
+							"name": "USP_UpdateExecutionDate",
+							"type": "SqlServerStoredProcedure",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"storedProcedureName": "[dbo].[usp_UpdateLastExecutionDate]",
+								"storedProcedureParameters": {
+									"ExecutionDate": {
+										"value": {
+											"value": "@utcnow(pipeline().TriggerTime)",
+											"type": "Expression"
+										},
+										"type": "DateTime"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "az_SQLDB_lekansqlserver",
+								"type": "LinkedServiceReference"
 							}
 						}
 					]
